@@ -1,10 +1,13 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import { ThirdwebProvider, ChainId } from '@thirdweb-dev/react';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+const activeChainId = ChainId.Mainnet;
+
+ReactDOM.render(
+  <ThirdwebProvider desiredChainId={activeChainId}>
     <App />
-  </React.StrictMode>,
-)
+  </ThirdwebProvider>,
+  document.getElementById('root')
+);

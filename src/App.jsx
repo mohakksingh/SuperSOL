@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ThirdwebProvider, useAddress, useMetamask, useDisconnect } from '@thirdweb-dev/react';
 import { WalletMultiButton, WalletModalProvider } from '@solana/wallet-adapter-react-ui';
@@ -138,7 +139,3 @@ function App() {
         </WalletProvider>
       </ConnectionProvider>
     </ThirdwebProvider>
-  );
-}
-
-export default App;
