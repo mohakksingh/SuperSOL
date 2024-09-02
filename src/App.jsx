@@ -53,15 +53,15 @@ function App() {
     new SolflareWalletAdapter({ network }),
   ];
 
-  const handleWalletConnect = async (publicKey) => {
-    try {
-      await axios.post(`https://supersol-backend.onrender.com/api/wallet/connect`, { walletAddress: publicKey.toString() }, { withCredentials: true });
-      console.log('Wallet connected successfully');
-      setWalletAddress(publicKey.toString()); // Update the wallet address state
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-    }
-  };
+  // const handleWalletConnect = async (publicKey) => {
+  //   try {
+  //     await axios.post(`https://supersol-backend.onrender.com/api/wallet/connect`, { walletAddress: publicKey.toString() }, { withCredentials: true });
+  //     console.log('Wallet connected successfully');
+  //     setWalletAddress(publicKey.toString()); // Update the wallet address state
+  //   } catch (error) {
+  //     console.error('Error connecting wallet:', error);
+  //   }
+  // };
 
   const fetchTransactions = async (publicKey) => {
     try {

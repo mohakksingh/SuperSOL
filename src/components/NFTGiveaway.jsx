@@ -84,13 +84,13 @@ const NFTGiveaway = () => {
       await connection.confirmTransaction(signature, 'processed');
 
       // After successful NFT transfer
-      await axios.post(`${import.meta.env.REACT_APP_BACKEND_URL}/api/transactions`, {
-        type: 'nft',
-        sender: publicKey.toString(),
-        recipient: winnerAddress,
-        nftId: selectedNFT.account.data.parsed.info.mint,
-        message: 'NFT Giveaway'
-      }, { withCredentials: true });
+      // await axios.post(`${import.meta.env.REACT_APP_BACKEND_URL}/api/transactions`, {
+      //   type: 'nft',
+      //   sender: publicKey.toString(),
+      //   recipient: winnerAddress,
+      //   nftId: selectedNFT.account.data.parsed.info.mint,
+      //   message: 'NFT Giveaway'
+      // }, { withCredentials: true });
 
       toast({
         title: 'NFT sent',
