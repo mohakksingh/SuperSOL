@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { getCreatorWallet } from '../services/api';
+// import { getCreatorWallet } from '../services/api';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';

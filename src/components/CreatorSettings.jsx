@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { register, login, getCreatorWallet } from '../services/api';
+// import { register, login, getCreatorWallet } from '../services/api';
 import { toast } from 'react-toastify';
 
 const CreatorSettings = () => {
