@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { ThirdwebProvider, useAddress, useMetamask, useDisconnect } from '@thirdweb-dev/react';
 import { WalletMultiButton, WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { ConnectionProvider, WalletProvider, useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { Toaster } from '@/components/ui/toaster';
@@ -11,7 +12,6 @@ import Onboarding from './components/Onboarding';
 import Giveaway from './components/Giveaway';
 import NFTGiveaway from './components/NFTGiveaway';
 import TransactionHistory from './components/TransactionHistory';
-import Auth from './components/Auth';
 import WalletBalance from './components/WalletBalance';
 import WalletConnect from './components/WalletConnect';
 import axios from 'axios';
@@ -25,83 +25,33 @@ function App() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
-  const { publicKey, connect, connected } = useWallet();
-  const {connectionWallet}=useConnection();
-  const [publicKeys,setPublicKeys]=useState(null);
+  const address = useAddress();
+  const connectWithMetamask = useMetamask();
+  const disconnect = useDisconnect();
 
   useEffect(() => {
-    const fetchPublicKey = async () => {
-      setPublicKeys(publicKey ? publicKey.toString() : null);
-      console.log(publicKey ? publicKey.toString() : 'No public key available');
-    };
-    fetchPublicKey();
-  }, [publicKey]);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(`https://supersol-backend.onrender.com/api/user`, { withCredentials: true });
-        if (response.data.user) {
-          setIsAuthenticated(true);
-          setUser(response.data.user);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-        setIsAuthenticated(false);
-        setUser(null);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (publicKey) {
-      console.log('Public Key:', publicKey.toString());
-      handleWalletConnect(publicKey);
-      fetchTransactions(publicKey);
+    if (address) {
+      console.log('Address:', address);
+      handleWalletConnect(address);
+      fetchTransactions(address);
     } else {
-      console.log('Public Key is not available');
+      console.log('Address is not available');
     }
-  }, [publicKey]);
+  }, [address]);
 
-  useEffect(() => {
-    const fetchWalletAddress = async () => {
-      try {
-        const response = await axios.get(`/api/wallet/creator`, { withCredentials: true });
-        setWalletAddress(response.data.walletAddress);
-      } catch (error) {
-        console.error('Error fetching creator wallet:', error);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchWalletAddress();
-    }
-  }, [isAuthenticated]);
-
-  const network = 'devnet';
-  const endpoint = clusterApiUrl(network);
-  const connection = new Connection(endpoint);
-
-  const wallets = [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter({ network }),
-  ];
-
-  const handleWalletConnect = async (publicKey) => {
+  const handleWalletConnect = async (address) => {
     try {
-      await axios.post(`https://supersol-backend.onrender.com/api/wallet/connect`, { walletAddress: publicKey.toString() }, { withCredentials: true });
+      await axios.post('http://localhost:5001/api/wallet/connect', { walletAddress: address }, { withCredentials: true });
       console.log('Wallet connected successfully');
-      setWalletAddress(publicKey.toString()); // Update the wallet address state
+      setWalletAddress(address); // Update the wallet address state
     } catch (error) {
       console.error('Error connecting wallet:', error);
     }
   };
 
-  const fetchTransactions = async (publicKey) => {
+  const fetchTransactions = async (address) => {
     try {
-      const confirmedSignatures = await connection.getConfirmedSignaturesForAddress2(new PublicKey(publicKey));
+      const confirmedSignatures = await connection.getConfirmedSignaturesForAddress2(new PublicKey(address));
       const transactionDetails = await Promise.all(
         confirmedSignatures.map(async (signatureInfo) => {
           const transaction = await connection.getConfirmedTransaction(signatureInfo.signature);
@@ -116,7 +66,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`https://supersol-backend.onrender.com/api/logout`, {}, { withCredentials: true });
+      await axios.post('https://supersol-backend.onrender.com/api/logout', {}, { withCredentials: true });
       setIsAuthenticated(false);
       setUser(null);
       setWalletAddress(null);
@@ -126,54 +76,68 @@ function App() {
     }
   };
 
+  const network = 'devnet';
+  const endpoint = clusterApiUrl(network);
+  const connection = new Connection(endpoint);
+
+  const wallets = [
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter({ network }),
+  ];
+
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <div className="container mx-auto px-4 py-8">
-            <header className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
-              <div className="flex items-center space-x-4">
-                <WalletMultiButton />
-                {isAuthenticated && (
-                  <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-                    Logout
+    <ThirdwebProvider activeChain="mainnet">
+      <ConnectionProvider endpoint={endpoint}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
+            <div className="container mx-auto px-4 py-8">
+              <header className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
+                <div className="flex items-center space-x-4">
+                  <WalletMultiButton />
+                  {isAuthenticated && (
+                    <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                      Logout
+                    </Button>
+                  )}
+                  <Button onClick={() => console.log('Address:', address ? address : 'Not connected')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    Log Address
                   </Button>
+                </div>
+              </header>
+              <main>
+                {isAuthenticated ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {!onboardingComplete && (
+                      <Onboarding onComplete={() => setOnboardingComplete(true)} />
+                    )}
+                    {onboardingComplete && (
+                      <>
+                        <p className="text-white">Welcome, {user.username}!</p>
+                        <WalletBalance />
+                        <WalletConnect />
+                        <LiveStream />
+                        <Superchat />
+                        <Giveaway />
+                        <NFTGiveaway />
+                        <TransactionHistory transactions={transactions} />
+                      </>
+                    )}
+                  </motion.div>
+                ) : (
+                  <Auth />
                 )}
-              </div>
-            </header>
-            <main>
-              {isAuthenticated ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {!onboardingComplete && (
-                    <Onboarding onComplete={() => setOnboardingComplete(true)} />
-                  )}
-                  {onboardingComplete && (
-                    <>
-                      <p className="text-white">Welcome, {user.username}!</p>
-                      <WalletBalance />
-                      <WalletConnect />
-                      <LiveStream />
-                      <Superchat />
-                      <Giveaway />
-                      <NFTGiveaway />
-                      <TransactionHistory />
-                    </>
-                  )}
-                </motion.div>
-              ) : (
-                <Auth />
-              )}
-            </main>
-          </div>
-          <Toaster position="bottom-right" />
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+              </main>
+            </div>
+            <Toaster position="bottom-right" />
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
+    </ThirdwebProvider>
   );
 }
 
