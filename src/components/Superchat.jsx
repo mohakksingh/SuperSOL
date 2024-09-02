@@ -13,6 +13,7 @@ const Superchat = () => {
   const { toast } = useToast();
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
+  const [creatorAddress, setCreatorAddress] = useState('');
 
   const handleSuperchat = async () => {
     if (!publicKey) {
@@ -24,7 +25,14 @@ const Superchat = () => {
       return;
     }
 
-    const creatorAddress = 'CREATOR_WALLET_ADDRESS'; // Replace with actual creator wallet
+    if (!creatorAddress) {
+      toast({
+        variant: 'destructive',
+        title: 'Creator address not provided',
+        description: 'Please enter the creator\'s wallet address.',
+      });
+      return;
+    }
 
     try {
       const transaction = new Transaction().add(
@@ -44,6 +52,7 @@ const Superchat = () => {
       });
       setAmount('');
       setMessage('');
+      setCreatorAddress('');
 
       // Here you would typically send the message to your backend
       console.log('Superchat message:', message);
@@ -65,6 +74,13 @@ const Superchat = () => {
       className="space-y-4 bg-gray-800 p-6 rounded-lg mb-8"
     >
       <h2 className="text-2xl text-white mb-4">Send Superchat</h2>
+      <Input
+        type="text"
+        value={creatorAddress}
+        onChange={(e) => setCreatorAddress(e.target.value)}
+        placeholder="Creator's Wallet Address"
+        className="w-full p-2 mb-4 bg-gray-700 rounded"
+      />
       <Input
         type="number"
         value={amount}
