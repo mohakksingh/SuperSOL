@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ThirdwebProvider, useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react';
-import { createThirdwebClient } from '@thirdweb-dev/sdk';
-import { ConnectButton } from '@thirdweb-dev/react';
+import { createThirdwebClient } from "thirdweb";
+import { ConnectButton } from "thirdweb/react";
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
@@ -75,6 +75,7 @@ function App() {
 
   return (
     <ThirdwebProvider clientId={`${import.meta.env.CLIENT_ID}`}>
+      <ConnectButton client={client} />;
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>
@@ -82,7 +83,6 @@ function App() {
               <header className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
                 <div className="flex items-center space-x-4">
-                  <ConnectButton client={client} />
                   <Button onClick={() => console.log('Address:', address ? address : 'Not connected')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                     Log Address
                   </Button>
