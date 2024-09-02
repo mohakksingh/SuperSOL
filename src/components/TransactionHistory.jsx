@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useToast } from '@/hooks/use-toast';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';  
+import { PublicKey } from '@solana/web3.js';
+import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHistory, FaCheckCircle, FaTimesCircle, FaCopy } from 'react-icons/fa';
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
@@ -10,29 +11,20 @@ const TransactionHistory = () => {
   const { toast } = useToast();
   const { publicKey } = useWallet();
   const { connection } = useConnection();
-  const [publicKeys, setPublicKeys] = useState(null);
-
-  useEffect(() => {
-    const fetchPublicKey = async () => {
-      setPublicKeys(publicKey ? publicKey.toString() : null);
-      console.log(publicKey ? publicKey.toString() : 'No public key available');
-    };
-    fetchPublicKey();
-  }, [publicKey]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!publicKeys) {
+      if (!publicKey) {
         setLoading(false);
         return;
       }
       try {
         console.log('Fetching transactions...');
-        const signatures = await connection.getSignaturesForAddress(new PublicKey(publicKeys));
+        const signatures = await connection.getSignaturesForAddress(publicKey);
         const transactionDetails = await Promise.all(
-          signatures.map(async (signatureInfo) => {
+          signatures.slice(0, 10).map(async (signatureInfo) => {
             const transaction = await connection.getTransaction(signatureInfo.signature);
-            return transaction;
+            return { ...transaction, signature: signatureInfo.signature };
           })
         );
         setTransactions(transactionDetails);
@@ -44,41 +36,96 @@ const TransactionHistory = () => {
       } catch (error) {
         console.error('Error fetching transactions:', error);
         toast({
-          backgroundColor: 'red',
-          title: 'Result',
-          description: 'No transactions found.',
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to load transactions. Please try again.',
         });
         setLoading(false);
       }
     };
 
     fetchTransactions();
-  }, [publicKeys, connection, toast]);
+  }, [publicKey, connection, toast]);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: 'Copied',
+      description: 'Transaction signature copied to clipboard.',
+    });
+  };
 
   if (loading) {
-    return <div>Loading transactions...</div>;
+    return (
+      <div className="bg-gray-800 p-6 rounded-lg mb-8 flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg mb-8">
-      <h2 className="text-2xl mb-4">Transaction History</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-gradient-to-br from-purple-900 to-fuchsia-900 p-6 rounded-lg mb-8"
+    >
+      <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+        <FaHistory className="mr-3 text-purple-300" /> Transaction History
+      </h2>
       {transactions.length === 0 ? (
-        <p>No transactions yet.</p>
+        <p className="text-gray-400 text-center">No transactions yet.</p>
       ) : (
-        <ul>
-          {transactions.map((transaction) => (
-            <li key={transaction.transaction.signatures[0]} className="mb-4 p-4 bg-gray-700 rounded">
-              <div>
-                <p><strong>Signature:</strong> {transaction.transaction.signatures[0]}</p>
-                <p><strong>Slot:</strong> {transaction.slot}</p>
-                <p><strong>Block Time:</strong> {new Date(transaction.blockTime * 1000).toLocaleString()}</p>
-                <p><strong>Transaction Error:</strong> {transaction.meta.err ? 'Yes' : 'No'}</p>
-              </div>
-            </li>
-          ))}
+        <ul className="space-y-4">
+          <AnimatePresence>
+            {transactions.map((transaction, index) => (
+              <motion.li
+                key={transaction.signature}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition-colors duration-200"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Signature:</p>
+                    <p className="text-gray-300 font-mono text-sm truncate w-64">
+                      {transaction.signature}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(transaction.signature)}
+                    className="text-gray-400 hover:text-white transition-colors duration-200"
+                  >
+                    <FaCopy />
+                  </button>
+                </div>
+                <div className="mt-2 flex justify-between items-center">
+                  <p className="text-sm text-gray-400">
+                    Slot: <span className="text-gray-200">{transaction.slot}</span>
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Block Time:{' '}
+                    <span className="text-gray-200">
+                      {new Date(transaction.blockTime * 1000).toLocaleString()}
+                    </span>
+                  </p>
+                  <p className="text-sm flex items-center">
+                    {transaction.meta.err ? (
+                      <FaTimesCircle className="text-red-400 mr-1" />
+                    ) : (
+                      <FaCheckCircle className="text-blue-400 mr-1" />
+                    )}
+                    {transaction.meta.err ? 'Failed' : 'Success'}
+                  </p>
+                </div>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
       )}
-    </div>
+    </motion.div>
   );
 };
 

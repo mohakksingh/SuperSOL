@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { FaGift, FaSpinner } from 'react-icons/fa';
 
 const NFTGiveaway = () => {
   const { publicKey, sendTransaction } = useWallet();
@@ -14,6 +16,7 @@ const NFTGiveaway = () => {
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [winnerAddress, setWinnerAddress] = useState('');
   const [creatorAddress, setCreatorAddress] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -100,14 +103,21 @@ const NFTGiveaway = () => {
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg mb-8">
-      <h2 className="text-2xl mb-4">NFT Giveaway</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-gradient-to-br from-purple-800 to-indigo-900 p-6 rounded-lg shadow-lg mb-8"
+    >
+      <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+        <FaGift className="mr-3 text-yellow-400" /> NFT Giveaway
+      </h2>
       {publicKey ? (
-        <>
+        <div className="space-y-4">
           <select
             value={selectedNFT ? selectedNFT.pubkey.toBase58() : ''}
             onChange={(e) => setSelectedNFT(nfts.find(nft => nft.pubkey.toBase58() === e.target.value))}
-            className="w-full p-2 mb-4 bg-gray-700 rounded"
+            className="w-full p-3 bg-purple-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="">Select an NFT</option>
             {nfts.map((nft) => (
@@ -121,20 +131,25 @@ const NFTGiveaway = () => {
             value={winnerAddress}
             onChange={(e) => setWinnerAddress(e.target.value)}
             placeholder="Winner's wallet address"
-            className="w-full p-2 mb-4 bg-gray-700 rounded"
+            className="w-full p-3 bg-purple-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <Button
             onClick={handleGiveaway}
-            disabled={!selectedNFT || !winnerAddress}
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            disabled={!selectedNFT || !winnerAddress || loading}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-purple-900 font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center"
           >
-            Give Away NFT
+            {loading ? (
+              <FaSpinner className="animate-spin mr-2" />
+            ) : (
+              <FaGift className="mr-2" />
+            )}
+            {loading ? 'Sending...' : 'Give Away NFT'}
           </Button>
-        </>
+        </div>
       ) : (
-        <p>Please connect your wallet to start an NFT giveaway.</p>
+        <p className="text-white text-center">Please connect your wallet to start an NFT giveaway.</p>
       )}
-    </div>
+    </motion.div>
   );
 };
 
