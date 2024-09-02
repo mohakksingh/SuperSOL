@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';  
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
@@ -28,10 +29,10 @@ const TransactionHistory = () => {
       }
       try {
         console.log('Fetching transactions...');
-        const confirmedSignatures = await connection.getConfirmedSignaturesForAddress2(new PublicKey(publicKeys));
+        const signatures = await connection.getSignaturesForAddress(new PublicKey(publicKeys));
         const transactionDetails = await Promise.all(
-          confirmedSignatures.map(async (signatureInfo) => {
-            const transaction = await connection.getConfirmedTransaction(signatureInfo.signature);
+          signatures.map(async (signatureInfo) => {
+            const transaction = await connection.getTransaction(signatureInfo.signature);
             return transaction;
           })
         );
@@ -68,10 +69,12 @@ const TransactionHistory = () => {
         <ul>
           {transactions.map((transaction) => (
             <li key={transaction.transaction.signatures[0]} className="mb-4 p-4 bg-gray-700 rounded">
-              <p><strong>Signature:</strong> {transaction.transaction.signatures[0]}</p>
-              <p><strong>Slot:</strong> {transaction.slot}</p>
-              <p><strong>Block Time:</strong> {new Date(transaction.blockTime * 1000).toLocaleString()}</p>
-              <p><strong>Transaction Error:</strong> {transaction.meta.err ? 'Yes' : 'No'}</p>
+              <div>
+                <p><strong>Signature:</strong> {transaction.transaction.signatures[0]}</p>
+                <p><strong>Slot:</strong> {transaction.slot}</p>
+                <p><strong>Block Time:</strong> {new Date(transaction.blockTime * 1000).toLocaleString()}</p>
+                <p><strong>Transaction Error:</strong> {transaction.meta.err ? 'Yes' : 'No'}</p>
+              </div>
             </li>
           ))}
         </ul>

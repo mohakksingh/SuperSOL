@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 const Giveaway = () => {
   const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
+  const { toast } = useToast();
   const [amount, setAmount] = useState('');
   const [winners, setWinners] = useState([]);
 
   const handleGiveaway = async () => {
-    if (!publicKey) return;
+    if (!publicKey) {
+      toast({
+        variant: 'destructive',
+        title: 'Wallet not connected',
+        description: 'Please connect your wallet first.',
+      });
+      return;
+    }
 
-    const connection = new Connection(import.meta.env.REACT_APP_MAINNET_URL);
+    if (winners.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No winners provided',
+        description: 'Please enter at least one winner wallet address.',
+      });
+      return;
+    }
+
     const amountPerWinner = parseFloat(amount) / winners.length;
 
     for (const winner of winners) {
@@ -29,11 +50,18 @@ const Giveaway = () => {
         await connection.confirmTransaction(signature, 'processed');
       } catch (error) {
         console.error('Error sending giveaway to winner:', error);
-        alert(`Failed to send giveaway to ${winner}. Please try again.`);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: `Failed to send giveaway to ${winner}. Please try again.`,
+        });
       }
     }
 
-    alert('Giveaway completed successfully!');
+    toast({
+      title: 'Giveaway completed',
+      description: 'Giveaway completed successfully!',
+    });
     setAmount('');
     setWinners([]);
   };
@@ -41,25 +69,25 @@ const Giveaway = () => {
   return (
     <div className="bg-gray-800 p-6 rounded-lg mb-10">
       <h2 className="text-2xl mb-4">Start Giveaway</h2>
-      <input
+      <Input
         type="number"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         placeholder="Total giveaway amount in SOL"
         className="w-full p-2 mb-4 bg-gray-700 rounded"
       />
-      <textarea
+      <Textarea
         value={winners.join('\n')}
         onChange={(e) => setWinners(e.target.value.split('\n'))}
         placeholder="Enter winner wallet addresses (one per line)"
         className="w-full p-2 mb-4 bg-gray-700 rounded"
       />
-      <button
+      <Button
         onClick={handleGiveaway}
         className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
       >
         Start Giveaway
-      </button>
+      </Button>
     </div>
   );
 };
