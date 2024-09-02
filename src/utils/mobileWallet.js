@@ -16,7 +16,7 @@ export const connectMobileWallet = async () => {
 
 export const sendMobileTransaction = async (transaction) => {
   try {
-    const connection = new Connection('https://solana-devnet.g.alchemy.com/v2/h6phOwxlgUqFY7waNm208YAE_OITiYpy');
+    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/h6phOwxlgUqFY7waNm208YAE_OITiYpy');
     const { signature } = await transact(async (wallet) => {
       const { signature } = await wallet.signAndSendTransaction(transaction);
       return { signature };

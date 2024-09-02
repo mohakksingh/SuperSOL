@@ -44,7 +44,7 @@ function App() {
     }
   }, [publicKey]);
 
-  const network = 'devnet';
+  const network = 'mainnet';
   const endpoint = clusterApiUrl(network);
   const connection = new Connection(endpoint);
 
