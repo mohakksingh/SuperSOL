@@ -44,7 +44,7 @@ function App() {
     }
   }, [publicKey]);
 
-  const network = 'mainnet-beta';
+  const network = 'devnet';
   const endpoint = clusterApiUrl(network);
   const connection = new Connection(endpoint);
 
@@ -77,21 +77,6 @@ function App() {
       console.error('Error fetching transactions:', error);
     }
   };
-
-  const fetchBalance = async (publicKey) => {
-    try {
-      const balance = await connection.getBalance(new PublicKey(publicKey));
-      console.log('Balance:', balance);
-    } catch (error) {
-      console.error('Error fetching balance:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (publicKey) {
-      fetchBalance(publicKey);
-    }
-  }, [publicKey]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
