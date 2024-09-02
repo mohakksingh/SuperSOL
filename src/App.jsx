@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ThirdwebProvider, useAddress, useMetamask, useDisconnect } from '@thirdweb-dev/react';
-import { createThirdwebClient } from 'thirdweb';
-import { ConnectButton } from 'thirdweb/react';
+import { ThirdwebProvider, useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react';
+import { createThirdwebClient } from '@thirdweb-dev/sdk';
+import { ConnectButton } from '@thirdweb-dev/react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-const client = createThirdwebClient({ clientId: "666a53b166faff499df59314427c43c2" });
+const client = createThirdwebClient({ clientId: `${import.meta.env.CLIENT_ID}` });
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
@@ -74,7 +74,7 @@ function App() {
   ];
 
   return (
-    <ThirdwebProvider activeChain="mainnet">
+    <ThirdwebProvider clientId={`${import.meta.env.CLIENT_ID}`}>
       <ConnectionProvider endpoint={endpoint}>
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>
