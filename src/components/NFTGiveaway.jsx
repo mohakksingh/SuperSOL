@@ -84,7 +84,7 @@ const NFTGiveaway = () => {
       await connection.confirmTransaction(signature, 'processed');
 
       // After successful NFT transfer
-      await axios.post('http://localhost:5001/api/transactions', {
+      await axios.post(`${import.meta.env.REACT_APP_BACKEND_URL}/api/transactions`, {
         type: 'nft',
         sender: publicKey.toString(),
         recipient: winnerAddress,

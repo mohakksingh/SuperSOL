@@ -7,7 +7,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:5001/auth/google';
+    window.location.href = `${import.meta.env.REACT_APP_BACKEND_URL}/auth/google`;
   };
 
   return (

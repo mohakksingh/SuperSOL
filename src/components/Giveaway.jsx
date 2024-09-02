@@ -10,7 +10,7 @@ const Giveaway = () => {
   const handleGiveaway = async () => {
     if (!publicKey) return;
 
-    const connection = new Connection('https://solana-devnet.g.alchemy.com/v2/h6phOwxlgUqFY7waNm208YAE_OITiYpy');
+    const connection = new Connection(import.meta.env.REACT_APP_MAINNET_URL);
     const amountPerWinner = parseFloat(amount) / winners.length;
 
     for (const winner of winners) {

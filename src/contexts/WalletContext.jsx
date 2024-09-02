@@ -9,8 +9,8 @@ import { clusterApiUrl } from '@solana/web3.js';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 const WalletContext = ({ children }) => {
-    const network = WalletAdapterNetwork.Devnet;
-    const endpoint = 'https://solana-devnet.g.alchemy.com/v2/h6phOwxlgUqFY7waNm208YAE_OITiYpy';
+    const network = WalletAdapterNetwork.Mainnet;
+    const endpoint = import.meta.env.REACT_APP_MAINNET_URL;
 
     const wallets = useMemo(
         () => [
