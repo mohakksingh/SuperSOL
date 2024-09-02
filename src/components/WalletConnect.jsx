@@ -1,27 +1,29 @@
 import React, { useEffect } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAddress, useMetamask, useDisconnect } from '@thirdweb-dev/react';
 import { useToast } from '../hooks/use-toast';
 import { Button } from '@/components/ui/button';
 
 const WalletConnect = () => {
-  const { publicKey, connect, disconnect } = useWallet();
+  const address = useAddress();
+  const connectWithMetamask = useMetamask();
+  const disconnect = useDisconnect();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (publicKey) {
+    if (address) {
       toast({
         title: 'Wallet connected',
-        description: `Connected to wallet with public key: ${publicKey.toString()}`,
+        description: `Connected to wallet with address: ${address}`,
       });
     }
-  }, [publicKey, toast]);
+  }, [address, toast]);
 
   return (
     <div>
-      {publicKey ? (
+      {address ? (
         <Button onClick={disconnect}>Disconnect Wallet</Button>
       ) : (
-        <Button onClick={connect}>Connect Wallet</Button>
+        <Button onClick={connectWithMetamask}>Connect Wallet</Button>
       )}
     </div>
   );
