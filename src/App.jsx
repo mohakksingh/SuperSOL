@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-const client = createThirdwebClient({ clientId: `${import.meta.env.CLIENT_ID}` });
+const client = createThirdwebClient({ clientId: "666a53b166faff499df59314427c43c2" });
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
