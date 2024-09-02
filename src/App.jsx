@@ -78,6 +78,21 @@ function App() {
     }
   };
 
+  const fetchBalance = async (publicKey) => {
+    try {
+      const balance = await connection.getBalance(new PublicKey(publicKey));
+      console.log('Balance:', balance);
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (publicKey) {
+      fetchBalance(publicKey);
+    }
+  }, [publicKey]);
+
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
