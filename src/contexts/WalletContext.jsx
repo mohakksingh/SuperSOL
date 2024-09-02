@@ -10,7 +10,7 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 
 const WalletContext = ({ children }) => {
     const network = WalletAdapterNetwork.Mainnet;
-    const endpoint = import.meta.env.REACT_APP_MAINNET_URL;
+    const endpoint = "https://api.mainnet-beta.solana.com";
 
     const wallets = useMemo(
         () => [

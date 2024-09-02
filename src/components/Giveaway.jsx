@@ -10,7 +10,7 @@ const Giveaway = () => {
   const handleGiveaway = async () => {
     if (!publicKey) return;
 
-    const connection = new Connection(import.meta.env.REACT_APP_MAINNET_URL);
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
     const amountPerWinner = parseFloat(amount) / winners.length;
 
     for (const winner of winners) {
