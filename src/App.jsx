@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ThirdwebProvider, useAddress, useMetamask, useDisconnect } from '@thirdweb-dev/react';
-import { WalletMultiButton, WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { createThirdwebClient } from 'thirdweb';
+import { ConnectButton } from 'thirdweb/react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
@@ -18,6 +20,8 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
+
+const client = createThirdwebClient({ clientId: `${import.meta.env.CLIENT_ID}` });
 
 function App() {
   const [walletAddress, setWalletAddress] = useState(null);
@@ -78,7 +82,7 @@ function App() {
               <header className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
                 <div className="flex items-center space-x-4">
-                  <WalletMultiButton />
+                  <ConnectButton client={client} />
                   <Button onClick={() => console.log('Address:', address ? address : 'Not connected')} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                     Log Address
                   </Button>
