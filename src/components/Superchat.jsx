@@ -6,14 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
+import { useVideo } from '../contexts/VideoContext';
 
 const Superchat = () => {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const { toast } = useToast();
+  const { creatorAddress } = useVideo();
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
-  const [creatorAddress, setCreatorAddress] = useState('');
 
   const handleSuperchat = async () => {
     if (!publicKey) {
@@ -52,7 +53,6 @@ const Superchat = () => {
       });
       setAmount('');
       setMessage('');
-      setCreatorAddress('');
 
       // Here you would typically send the message to your backend
       console.log('Superchat message:', message);
@@ -77,9 +77,9 @@ const Superchat = () => {
       <Input
         type="text"
         value={creatorAddress}
-        onChange={(e) => setCreatorAddress(e.target.value)}
         placeholder="Creator's Wallet Address"
         className="w-full p-2 mb-4 bg-gray-700 rounded"
+        readOnly
       />
       <Input
         type="number"

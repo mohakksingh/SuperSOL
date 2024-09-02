@@ -15,6 +15,7 @@ import WalletBalance from './components/WalletBalance';
 import WalletConnect from './components/WalletConnect';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
+import { VideoProvider } from './contexts/VideoContext';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
@@ -82,37 +83,39 @@ function App() {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <div className="container mx-auto px-4 py-8">
-            <header className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
-              <div className="flex items-center space-x-4">
-                <WalletMultiButton />
-              </div>
-            </header>
-            <main>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                {!onboardingComplete && (
-                  <Onboarding onComplete={() => setOnboardingComplete(true)} />
-                )}
-                {onboardingComplete && (
-                  <>
-                    <WalletBalance />
-                    <WalletConnect />
-                    <LiveStream />
-                    <Superchat />
-                    <Giveaway />
-                    <NFTGiveaway />
-                    <TransactionHistory />
-                  </>
-                )}
-              </motion.div>
-            </main>
-          </div>
-          <Toaster position="bottom-right" />
+          <VideoProvider>
+            <div className="container mx-auto px-4 py-8">
+              <header className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-white">Solana YouTube Superchat</h1>
+                <div className="flex items-center space-x-4">
+                  <WalletMultiButton />
+                </div>
+              </header>
+              <main>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {!onboardingComplete && (
+                    <Onboarding onComplete={() => setOnboardingComplete(true)} />
+                  )}
+                  {onboardingComplete && (
+                    <>
+                      <WalletBalance />
+                      <WalletConnect />
+                      <LiveStream />
+                      <Superchat />
+                      <Giveaway />
+                      <NFTGiveaway />
+                      <TransactionHistory />
+                    </>
+                  )}
+                </motion.div>
+              </main>
+            </div>
+            <Toaster position="bottom-right" />
+          </VideoProvider>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
