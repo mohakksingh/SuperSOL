@@ -7,7 +7,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.REACT_APP_BACKEND_URL}/auth/google`;
+    window.location.href = `https://supersol-backend.onrender.com/auth/google`;
   };
 
   return (
