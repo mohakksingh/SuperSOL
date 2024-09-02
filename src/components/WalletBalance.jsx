@@ -1,4 +1,3 @@
-// src/components/WalletBalance.jsx
 import React, { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -24,10 +23,8 @@ const WalletBalance = () => {
     };
 
     fetchBalance();
-    // Set up an interval to refresh the balance every 30 seconds
     const intervalId = setInterval(fetchBalance, 30000);
 
-    // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
   }, [publicKey, connection]);
 

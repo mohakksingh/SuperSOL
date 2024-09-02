@@ -1,4 +1,3 @@
-// src/components/TransactionHistory.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';

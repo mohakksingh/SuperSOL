@@ -54,7 +54,6 @@ const Superchat = () => {
       setAmount('');
       setMessage('');
 
-      // Here you would typically send the message to your backend
       console.log('Superchat message:', message);
     } catch (error) {
       console.error('Error sending superchat:', error);

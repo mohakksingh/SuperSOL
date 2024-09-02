@@ -3,7 +3,7 @@ import YouTube from 'react-youtube';
 import { useVideo } from '../contexts/VideoContext';
 import axios from 'axios';
 
-const YOUTUBE_API_KEY = `${import.meta.env.VITE_YOUTUBE_API_KEY}`; // Replace with your YouTube API key
+const YOUTUBE_API_KEY = `${import.meta.env.VITE_YOUTUBE_API_KEY}`; 
 
 const LiveStream = () => {
   const { setVideoUrl, setCreatorAddress } = useVideo();
@@ -14,7 +14,7 @@ const LiveStream = () => {
 
   const handleInputChange = (e) => {
     setInputUrl(e.target.value);
-    setError(null); // Clear any previous errors
+    setError(null); 
   };
 
   const onReady = (event) => {
@@ -62,7 +62,7 @@ const LiveStream = () => {
   };
 
   const extractWalletAddress = (description) => {
-    const walletAddressRegex = /[A-Za-z0-9]{32,44}/; // Adjust the regex based on the expected wallet address format
+    const walletAddressRegex = /[A-Za-z0-9]{32,44}/; 
     const match = description.match(walletAddressRegex);
     console.log("this it mathc", match)
     return match ? match[0] : null;
