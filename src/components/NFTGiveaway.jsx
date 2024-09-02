@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,14 +14,12 @@ const NFTGiveaway = () => {
   const [nfts, setNfts] = useState([]);
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [winnerAddress, setWinnerAddress] = useState('');
-  const [creatorAddress, setCreatorAddress] = useState(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (publicKey) {
       fetchNFTs();
-      fetchCreatorAddress();
     }
   }, [publicKey, connection]);
 
@@ -30,6 +27,7 @@ const NFTGiveaway = () => {
     if (!publicKey) return;
 
     try {
+      setLoading(true);
       const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
         programId: TOKEN_PROGRAM_ID,
       });
@@ -40,17 +38,15 @@ const NFTGiveaway = () => {
       );
 
       setNfts(nftAccounts);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching NFTs:', error);
-    }
-  };
-
-  const fetchCreatorAddress = async () => {
-    try {
-      const response = await getCreatorWallet();
-      setCreatorAddress(response.data.walletAddress);
-    } catch (error) {
-      console.error('Error fetching creator wallet:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to fetch NFTs. Please try again.',
+      });
+      setLoading(false);
     }
   };
 
@@ -58,6 +54,7 @@ const NFTGiveaway = () => {
     if (!publicKey || !selectedNFT || !winnerAddress) return;
 
     try {
+      setLoading(true);
       const winnerPublicKey = new PublicKey(winnerAddress);
       const nftMint = new PublicKey(selectedNFT.account.data.parsed.info.mint);
 
@@ -99,6 +96,8 @@ const NFTGiveaway = () => {
         title: 'Error',
         description: 'Failed to send NFT. Please try again.',
       });
+    } finally {
+      setLoading(false);
     }
   };
 

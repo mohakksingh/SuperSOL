@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import YouTube from 'react-youtube';
 import { useVideo } from '../contexts/VideoContext';
+import { useWallet } from '@solana/wallet-adapter-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaYoutube, FaSearch, FaExclamationCircle, FaCheckCircle } from 'react-icons/fa';
@@ -9,6 +10,7 @@ const YOUTUBE_API_KEY = `${import.meta.env.VITE_YOUTUBE_API_KEY}`;
 
 const LiveStream = () => {
   const { setVideoUrl, setCreatorAddress } = useVideo();
+  const { publicKey } = useWallet();
   const [inputUrl, setInputUrl] = useState('');
   const [videoId, setVideoId] = useState('');
   const [player, setPlayer] = useState(null);
@@ -16,9 +18,16 @@ const LiveStream = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    if (publicKey) {
+      setCreatorAddress(publicKey.toString());
+    }
+  }, [publicKey, setCreatorAddress]);
+
   const handleInputChange = (e) => {
     setInputUrl(e.target.value);
-    setError(null); 
+    setError(null);
+    setSuccess(false);
   };
 
   const onReady = (event) => {
@@ -28,6 +37,8 @@ const LiveStream = () => {
   const onError = (event) => {
     console.error('YouTube player error:', event.data);
     setError('An error occurred while loading the video. Please check the URL and try again.');
+    setSuccess(false);
+    setVideoId('');
   };
 
   const extractVideoId = (url) => {
@@ -41,8 +52,10 @@ const LiveStream = () => {
     }
   };
 
-  const fetchCreatorWallet = async (videoId) => {
+  const fetchVideoDetails = async (videoId) => {
     setLoading(true);
+    setError(null);
+    setSuccess(false);
     try {
       const response = await axios.get(`https://www.googleapis.com/youtube/v3/videos`, {
         params: {
@@ -52,24 +65,19 @@ const LiveStream = () => {
         },
       });
       if (response.data.items && response.data.items.length > 0) {
-        const description = response.data.items[0].snippet.description;
-        const walletAddress = extractWalletAddress(description);
-        setCreatorAddress(walletAddress);
+        setSuccess(true);
+        setVideoId(videoId);
       } else {
-        setError('No video found with the given ID.');
+        setError('No video found with the given link.');
+        setVideoId('');
       }
     } catch (error) {
-      console.error('Error fetching creator wallet:', error);
+      console.error('Error fetching video details:', error);
       setError('Failed to fetch video details. Please check your API key and try again.');
+      setVideoId('');
     } finally {
       setLoading(false);
     }
-  };
-
-  const extractWalletAddress = (description) => {
-    const walletAddressRegex = /[A-Za-z0-9]{32,44}/; 
-    const match = description.match(walletAddressRegex);
-    return match ? match[0] : null;
   };
 
   const handleSubmit = (e) => {
@@ -77,11 +85,12 @@ const LiveStream = () => {
     if (inputUrl) {
       const id = extractVideoId(inputUrl);
       if (id) {
-        setVideoId(id);
         setVideoUrl(inputUrl);
-        fetchCreatorWallet(id);
+        fetchVideoDetails(id);
       } else {
         setError('Invalid YouTube URL. Please enter a valid URL.');
+        setSuccess(false);
+        setVideoId('');
       }
     }
   };
@@ -91,7 +100,7 @@ const LiveStream = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-br from-red-900 to-pink-800 rounded-lg shadow-lg p-6 mb-8"
+      className="bg-gradient-to-br from-purple-900 to-fuchsia-900 p-6 rounded-lg shadow-lg mb-8"
     >
       <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
         <FaYoutube className="mr-3 text-red-500" /> Live Stream
