@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useToast } from '../hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaWallet, FaSignOutAlt, FaCheckCircle } from 'react-icons/fa';
+import { FaWallet, FaSignOutAlt, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 
 const WalletConnect = () => {
-  const { publicKey, connect, disconnect } = useWallet();
+  const { publicKey, disconnect, connected } = useWallet();
   const { toast } = useToast();
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     if (publicKey) {
@@ -18,6 +20,25 @@ const WalletConnect = () => {
       });
     }
   }, [publicKey, toast]);
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+      toast({
+        title: 'Wallet disconnected',
+        description: 'Your wallet has been disconnected.',
+        icon: <FaSignOutAlt className="h-5 w-5 text-yellow-500" />,
+      });
+    } catch (error) {
+      console.error('Failed to disconnect wallet:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Disconnection Failed',
+        description: 'Failed to disconnect wallet. Please try again.',
+        icon: <FaExclamationCircle className="h-5 w-5 text-red-500" />,
+      });
+    }
+  };
 
   return (
     <motion.div
@@ -30,7 +51,7 @@ const WalletConnect = () => {
         <FaWallet className="mr-2 text-yellow-400" /> Wallet Connection
       </h2>
       <AnimatePresence mode="wait">
-        {publicKey ? (
+        {connected ? (
           <motion.div
             key="connected"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -45,7 +66,7 @@ const WalletConnect = () => {
               </p>
             </div>
             <Button
-              onClick={disconnect}
+              onClick={handleDisconnect}
               className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center"
             >
               <FaSignOutAlt className="mr-2" /> Disconnect Wallet
@@ -59,12 +80,7 @@ const WalletConnect = () => {
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
           >
-            <Button
-              onClick={connect}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center"
-            >
-              <FaWallet className="mr-2" /> Connect Wallet
-            </Button>
+            <WalletMultiButton className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center" />
           </motion.div>
         )}
       </AnimatePresence>

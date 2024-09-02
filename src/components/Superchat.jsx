@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
 import { useVideo } from '../contexts/VideoContext';
-import { FaCoins, FaPaperPlane } from 'react-icons/fa';
+import { FaCoins, FaPaperPlane, FaUser } from 'react-icons/fa';
 
 const Superchat = () => {
   const { publicKey, sendTransaction } = useWallet();
@@ -22,10 +22,11 @@ const Superchat = () => {
     if (!publicKey || !creatorAddress) return;
     setSending(true);
     try {
+      const recipientPubkey = new PublicKey(creatorAddress);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: new PublicKey(creatorAddress),
+          toPubkey: recipientPubkey,
           lamports: parseFloat(amount) * LAMPORTS_PER_SOL,
         })
       );
@@ -61,13 +62,15 @@ const Superchat = () => {
       <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         <FaCoins className="mr-2 text-yellow-500" /> Send Superchat
       </h2>
-      <Input
-        type="text"
-        value={creatorAddress}
-        placeholder="Creator's Wallet Address"
-        className="w-full p-3 mb-4 bg-gray-700 rounded-lg text-white"
-        readOnly
-      />
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-white mb-2">Creator's Address:</label>
+        <Input
+          type="text"
+          value={creatorAddress || 'No creator address found'}
+          readOnly
+          className="w-full p-3 bg-gray-700 rounded-lg text-white"
+        />
+      </div>
       <Input
         type="number"
         value={amount}
