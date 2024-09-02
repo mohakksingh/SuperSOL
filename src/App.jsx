@@ -16,6 +16,7 @@ import WalletBalance from './components/WalletBalance';
 import WalletConnect from './components/WalletConnect';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
+import { BACKEND_URL, MAINNET_URL } from './config';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
@@ -40,7 +41,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/user', { withCredentials: true });
+        const response = await axios.get(`${BACKEND_URL}/api/user`, { withCredentials: true });
         if (response.data.user) {
           setIsAuthenticated(true);
           setUser(response.data.user);
@@ -91,7 +92,7 @@ function App() {
 
   const handleWalletConnect = async (publicKey) => {
     try {
-      await axios.post('http://localhost:5001/api/wallet/connect', { walletAddress: publicKey.toString() }, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/wallet/connect`, { walletAddress: publicKey.toString() }, { withCredentials: true });
       console.log('Wallet connected successfully');
       setWalletAddress(publicKey.toString()); // Update the wallet address state
     } catch (error) {
@@ -116,7 +117,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5001/api/logout', {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/logout`, {}, { withCredentials: true });
       setIsAuthenticated(false);
       setUser(null);
       setWalletAddress(null);
