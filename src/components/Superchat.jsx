@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
 import { useVideo } from '../contexts/VideoContext';
-import { FaCoins, FaPaperPlane, FaUser } from 'react-icons/fa';
+import { FaCoins, FaPaperPlane, FaUser, FaEdit } from 'react-icons/fa';
 
 const Superchat = () => {
   const { publicKey, sendTransaction } = useWallet();
@@ -17,12 +17,20 @@ const Superchat = () => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (creatorAddress) {
+      setRecipientAddress(creatorAddress);
+    }
+  }, [creatorAddress]);
 
   const handleSuperchat = async () => {
-    if (!publicKey || !creatorAddress) return;
+    if (!publicKey || !recipientAddress) return;
     setSending(true);
     try {
-      const recipientPubkey = new PublicKey(creatorAddress);
+      const recipientPubkey = new PublicKey(recipientAddress);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
@@ -52,6 +60,10 @@ const Superchat = () => {
     }
   };
 
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -62,14 +74,30 @@ const Superchat = () => {
       <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         <FaCoins className="mr-2 text-yellow-500" /> Send Superchat
       </h2>
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <label className="block text-sm font-medium text-white mb-2">Creator's Address:</label>
-        <Input
-          type="text"
-          value={creatorAddress || 'No creator address found'}
-          readOnly
-          className="w-full p-3 bg-gray-700 rounded-lg text-white"
-        />
+        <div className="flex items-center">
+          <Input
+            type="text"
+            value={recipientAddress}
+            onChange={(e) => setRecipientAddress(e.target.value)}
+            readOnly={!isEditing}
+            className={`w-full p-3 bg-gray-700 rounded-lg text-white ${
+              isEditing ? 'border-blue-500' : ''
+            }`}
+          />
+          <Button
+            onClick={toggleEdit}
+            className="ml-2 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg"
+          >
+            <FaEdit />
+          </Button>
+        </div>
+        {isEditing && (
+          <p className="text-xs text-gray-300 mt-1">
+            Edit the address if needed, or leave as is if correct.
+          </p>
+        )}
       </div>
       <Input
         type="number"
@@ -88,7 +116,7 @@ const Superchat = () => {
       <Button
         onClick={handleSuperchat}
         className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center"
-        disabled={!publicKey || !creatorAddress || sending}
+        disabled={!publicKey || !recipientAddress || sending}
       >
         {sending ? (
           <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
