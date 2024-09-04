@@ -17,6 +17,7 @@ import { VideoProvider } from './contexts/VideoContext';
 import { FaRocket } from 'react-icons/fa';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
+import LiveChat from './components/LiveChat';
 
 function App() {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
@@ -82,14 +83,18 @@ function App() {
                         <FaRocket className="mr-2 text-blue-500" />
                         SuperSOL
                       </h1>
-                      <WalletMultiButton />
                     </header>
                     <main className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <WalletBalance />
                         <WalletConnect />
                       </div>
+                      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      
+                      <LiveChat />
+                      </div> */}
                       <LiveStream />
+                      
                       <Superchat />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <Giveaway />

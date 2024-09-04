@@ -3,6 +3,7 @@ import YouTube from 'react-youtube';
 import { useVideo } from '../contexts/VideoContext';
 import axios from 'axios';
 import { FaYoutube, FaSearch, FaExclamationCircle } from 'react-icons/fa';
+import LiveChat from './LiveChat';
 
 const YOUTUBE_API_KEY = `${import.meta.env.VITE_YOUTUBE_API_KEY}`;
 
@@ -12,6 +13,7 @@ const LiveStream = () => {
   const [videoId, setVideoId] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [giveawayParticipants, setGiveawayParticipants] = useState([]);
 
   const handleInputChange = (e) => {
     setInputUrl(e.target.value);
@@ -110,6 +112,11 @@ const LiveStream = () => {
     }
   };
 
+  const handleParticipantsUpdate = (participants) => {
+    setGiveawayParticipants(participants);
+    // You can use this updated list of participants for other purposes in your app
+  };
+
   return (
     <div className="bg-gradient-to-br from-purple-900 to-fuchsia-900 p-6 rounded-lg shadow-lg mb-8">
       <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
@@ -142,19 +149,24 @@ const LiveStream = () => {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
         </div>
       ) : videoId ? (
-        <div className="rounded-lg overflow-hidden shadow-2xl">
-          <YouTube
-            videoId={videoId}
-            opts={{
-              height: '390',
-              width: '100%',
-              playerVars: {
-                autoplay: 1,
-              },
-            }}
-            onReady={onReady}
-            onError={onError}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="rounded-lg overflow-hidden shadow-2xl">
+            <YouTube
+              videoId={videoId}
+              opts={{
+                height: '390',
+                width: '100%',
+                playerVars: {
+                  autoplay: 1,
+                },
+              }}
+              onReady={onReady}
+              onError={onError}
+            />
+          </div>
+          <div className="h-[390px]">
+            <LiveChat videoId={videoId} onParticipantsUpdate={handleParticipantsUpdate} />
+          </div>
         </div>
       ) : (
         <div className="bg-gray-700 rounded-lg p-8 text-center">
