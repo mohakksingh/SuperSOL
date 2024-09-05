@@ -171,7 +171,7 @@ const LiveStream = () => {
       ) : (
         <div className="bg-gray-700 rounded-lg p-8 text-center">
           <FaYoutube className="text-6xl text-red-500 mb-4 mx-auto" />
-          <p className="text-white text-lg">Enter a YouTube URL to start streaming</p>
+          <p className="text-white text-lg">Enter a YouTube URL to get the wallet address of the creator/ viewers for giveaway</p>
         </div>
       )}
     </div>
