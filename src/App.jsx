@@ -25,7 +25,7 @@ function App() {
   const { connection } = useConnection();
   const [transactions, setTransactions] = useState([]);
 
-  const network = 'mainnet-beta';
+  const network = 'mainnet';
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
